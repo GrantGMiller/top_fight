@@ -1,5 +1,4 @@
 import math
-
 import pygame
 
 
@@ -16,8 +15,8 @@ class Physics(pygame.Rect):
     ):
         # position
         super().__init__(rect)
-        self._position = pygame.Vector2(
-            self.center)  # self.center is integer only, need to keep floating point resolution
+        self.position = pygame.Vector2(
+            self.center)  # self.center is integer only, this will keep floating point resolution
         self._velocity = pygame.Vector2(
             initVelocity
         )  # pixels per second (or per frame if no "clock" parameter is passed to .Update())
@@ -65,8 +64,8 @@ class Physics(pygame.Rect):
 
         deltaVelocity = self._velocity * deltaTime
 
-        self._position += deltaVelocity
-        self.center = self._position
+        self.position += deltaVelocity
+        self.center = self.position
 
         if self._velocity.magnitude():
             frictionAcceleration = self._velocity.rotate(180).normalize() * self.friction

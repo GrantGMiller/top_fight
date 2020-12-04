@@ -1,5 +1,5 @@
 Top Fight
 =========
 
-.. figure:: /_images/GMT_coverlogo.png
+.. figure:: https://raw.githubusercontent.com/GrantGMiller/top_fight/master/top%20fight%20demo2.gif
    :width: 90%

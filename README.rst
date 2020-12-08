@@ -1,5 +1,5 @@
 Top Fight
 =========
 
-.. figure:: https://raw.githubusercontent.com/GrantGMiller/top_fight/master/top%20fight%20demo2.gif
+.. figure:: https://www.youtube.com/embed/0QfufEN84hw
    :width: 90%

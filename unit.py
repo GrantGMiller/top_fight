@@ -1,4 +1,5 @@
 import math
+import random
 
 import pygame
 from helpers import rot_center
@@ -7,17 +8,22 @@ from physics import Physics
 
 
 class Unit(Physics):
-    def __init__(self, screen, imgPath=None, name=None):
+    def __init__(self, screen, imgPath=None, name=None, highlight=False):
         self.screen = screen
-        self.name = name or imgPath
+        self.name = name or f'Name {random.randint(1111, 9999)}'
+        self.highlight = highlight
+
         Physics.__init__(
             self,
             rect=(0, 0, 100, 100),
             initAngularVelocity=3000,
-            friction=100,  # acceleration in  per second
+            friction=0,  # acceleration in  per second
             angularFriction=100,  # acceleration in degrees per second
         )
-        self.imgBase = pygame.image.load(imgPath or r'parts\1.png')
+        if isinstance(imgPath, str):
+            self.imgBase = pygame.image.load(imgPath or r'parts\1.png')
+        else:
+            self.imgBase = imgPath
         self.imgBase = self.imgBase.convert_alpha()
         self.imgBase = pygame.transform.scale(self.imgBase, self.size)
         self.image = self.imgBase
@@ -25,13 +31,27 @@ class Unit(Physics):
         self.edgeFriction = 100
 
         self._mask = None
+        self.angVelocityLimit = 500
         self._UpdateMask()
+
+        self.font = pygame.font.Font(None, 16) if not self.highlight else pygame.font.Font(None, 32)
+        self.fontColor = pygame.color.Color('white') if not self.highlight else pygame.color.Color('cyan')
+
+        avgColor = pygame.transform.average_color(self.imgBase)
+        font = pygame.font.Font(None, int(self.height / 3))
+        self.surfTitle = font.render(self.name, True, avgColor)
 
     def _UpdateMask(self):
         self.mask = pygame.mask.from_surface(self.image)
         maskRect = self.mask.get_bounding_rects()[0]
         maskRect.center = self.center
         self.maskRect = maskRect
+
+        if self.angularVelocity < self.angVelocityLimit:
+            size = self.angVelocityLimit - self.angularVelocity
+            size = max(12, size)
+            size = min(48, size)
+            self.font = pygame.font.Font(None, int(size))
 
     def BounceOffWalls(self):
         screenRect = self.screen.get_rect()
@@ -131,7 +151,24 @@ class Unit(Physics):
         self.image = pygame.transform.rotate(self.imgBase, self.angle)
         self.center = oldCenter
 
+    def DrawHighlight(self):
+        if self.highlight:
+            self.screen.blit(
+                self.surfTitle,
+                (
+                    self.centerx - self.surfTitle.get_width()/2,
+                    self.top - self.surfTitle.get_height(),
+                )
+            )
+
     def Draw(self, clock):
+        # limit the rotation
+        self.angularVelocity = min(100000, self.angularVelocity)
+
+        # limit speed
+        if self.velocity.magnitude() > 10000:
+            self.velocity = self.velocity.normalize() * 10000
+
         self.Rotate()
         self._UpdateMask()
         self.BounceOffWalls()
@@ -144,3 +181,20 @@ class Unit(Physics):
                 self.center[1] - self.image.get_height() / 2,
             )
         )
+
+        # draw the rpm heads up
+        wordSurface = self.font.render(
+            f'{self.rpm}',
+            True,
+            self.fontColor if self.angularVelocity > self.angVelocityLimit else pygame.color.Color(
+                'red')
+        )
+        if math.fabs(self.angularVelocity) < self.angVelocityLimit/10:
+            self.velocity *= 0.95
+
+        self.screen.blit(
+            wordSurface,
+            self.topleft,
+        )
+
+        self.DrawHighlight()

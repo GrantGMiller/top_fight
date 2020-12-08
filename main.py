@@ -1,11 +1,13 @@
 import random
+import sys
 import time
 
 import pygame
 
+from choose_top import Choose
 from game import Game
 from maker import Maker
-from unit import Unit
+from winner import Winner
 
 pygame.init()
 
@@ -19,30 +21,43 @@ screen = pygame.display.set_mode(
 
 maker = Maker(screen)
 
-game = Game(screen)
-
-# unit = game.AddUnit(Unit(screen))
-# unit.position = screen.get_rect().center
-
-for i in range(int(screen.get_width() / 300)):
-    game.AddRandomUnit()
-
-game.AddGravity(screen.get_rect().center, random.randint(50, 100))
-for i in range(random.randint(4, int(screen.get_width()/100))):
-    game.AddGravity(
-        (
-            random.randint(0, screen.get_width()),
-            random.randint(0, screen.get_height())
-        ),
-        random.randint(10, 25),
-    )
-
+choose = Choose(screen)
 clock = pygame.time.Clock()
 
-active = game
+active = choose
 
+lastGameEndTime = None
+gameOverTime = None
 while True:
+
+    if isinstance(active, Choose):
+        if active.startGameWith is not None:
+            index, stats = active.startGameWith
+            game = Game(screen)
+            game.NewGame(index, stats, numUnits=1, name='Player 1')
+            gameOverTime = None
+            active = game
+
+    elif isinstance(active, Game):
+        if game.gameOver:
+            if gameOverTime is None:
+                gameOverTime = time.time()
+            if time.time() - gameOverTime > 5:
+                active = Winner(game.units[0], screen)
+                lastGameEndTime = time.time()
+
+    elif isinstance(active, Winner) and time.time() - lastGameEndTime > 5:
+        # game = Game(screen)
+        # game.NewGame(numUnits=2)
+        # gameOverTime = None
+        # active = game
+
+        active = Choose(screen)
+
     for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+
         active.Event(event)
 
     active.Draw(clock)
@@ -59,5 +74,5 @@ while True:
     )
     screen.blit(surface_osd, (0, 0))
 
-    clock.tick(120)
+    clock.tick()
     pygame.display.flip()

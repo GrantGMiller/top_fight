@@ -68,9 +68,7 @@ class Physics(pygame.Rect):
         self.center = self.position
 
         if self._velocity.magnitude():
-            frictionAcceleration = self._velocity.rotate(180).normalize() * self.friction
-            frictionAcceleration *= deltaTime
-            self._acceleration += frictionAcceleration
+            self._velocity -= self._velocity.normalize() * self.friction * deltaTime
 
         self._velocity += self._acceleration * deltaTime
 
@@ -83,3 +81,6 @@ class Physics(pygame.Rect):
             self._angularVelocity += self.angularFriction * deltaTime
 
         self.angularVelocity += self._angularAcceleration * deltaTime
+
+        # print('velocity=', self._velocity)
+        # print('acceleration=', self._acceleration)

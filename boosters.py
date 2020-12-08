@@ -90,8 +90,8 @@ class VelocityBooster(_BaseBooster):
     def Activate(self, unit):
         super().Activate(unit)
         unit.velocity *= 2
-        if unit.velocity.magnitude() < 200:
-            unit.velocity = unit.velocity.normalize() * 200
+        if unit.velocity.magnitude() < 300:
+            unit.velocity = unit.velocity.normalize() * 300
 
         for i in range(25):
             self.game.AddParticle(

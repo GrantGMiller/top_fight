@@ -1,13 +1,15 @@
 import math
 import os
 import random
+import time
+
 import helpers
 import stats
 from physics import Physics
 
 import pygame
 
-IMG_DIR = r'C:\Users\gmiller\PycharmProjects\top_fight\parts'
+IMG_DIR = r'parts'
 
 COLOR_MAP = {
     'attack': pygame.color.Color((255, 127, 127)),
@@ -28,7 +30,8 @@ class Choose:
             pygame.transform.scale(pygame.image.load(IMG_DIR + '/' + path), (self.imgSize, self.imgSize)) for path in
             os.listdir(IMG_DIR)
         ]
-        self.currentSelection = int(len(self.images) / 2)
+        # self.currentSelection = int(len(self.images) / 2)
+        self.currentSelection = random.choice(list(range(len(self.images))))
         self.surfName = None
 
         self.stats = ['attack', 'defense', 'spin']
@@ -40,6 +43,7 @@ class Choose:
         self.startGameWith = None
 
         self.UpdateTextSurfaces()
+        self.startTime = time.time()
 
     def UpdateTextSurfaces(self):
         self.surfName = pygame.font.Font(None, int(self.screen.get_height() / 10)).render(
@@ -111,6 +115,8 @@ class Choose:
 
             self.UpdateTextSurfaces()
 
+            self.startTime = time.time()
+
         if event.type == pygame.KEYDOWN and (event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN):
             self.startGameWith = (
                 self.images[self.currentSelection],
@@ -170,3 +176,9 @@ class Choose:
                 int(self.screen.get_height() - (self.screen.get_height() - self.imgSize) / 2),
             )
         )
+
+        if time.time() - self.startTime > 10:
+            self.startGameWith = (
+                self.images[self.currentSelection],
+                stats.GetStats(self.currentSelection)
+            )

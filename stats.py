@@ -4,7 +4,7 @@ import random
 
 
 def GetStats(ID):
-    path = f'C:\\Users\\gmiller\\PycharmProjects\\top_fight\\stats\\{ID}.json'
+    path = f'stats\\{ID}.json'
     if not os.path.exists(path):
         d = {
             'attack': 0,

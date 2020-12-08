@@ -42,6 +42,7 @@ class Game:
             )
             unit.angularVelocity += stats.get('spin', 0) * 10
             self.player = unit
+            unit.position = (unit.width, unit.height)
 
         for i in range(numUnits or int(self.surf.get_width() / 300) + 2):
             self.AddRandomUnit()
@@ -66,13 +67,13 @@ class Game:
             Unit(
                 self.surf,
                 imgPath=random.choice(
-                    ['parts/' + item for item in os.listdir(r'C:\Users\gmiller\PycharmProjects\top_fight\parts')]
+                    ['parts/' + item for item in os.listdir(r'parts')]
                 ),
                 **k
             ),
         )
         other.position = (
-            random.randint(0, self.surf.get_width()),
+            random.randint(int(3 * self.surf.get_width() / 4), self.surf.get_width()),
             random.randint(0, self.surf.get_height())
         )
         other.velocity = (random.randint(100, 200), random.randint(50, 100))
@@ -217,8 +218,6 @@ class Game:
                     unit.centery - booster.centery + booster.width * 2
                 )
                 if unit.mask.overlap(booster.mask, offset):
-                    print('booster=', booster.mask)
-                    print('unit=', unit.mask)
                     booster.Activate(unit)
                     break
 

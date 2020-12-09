@@ -2,7 +2,7 @@ import math
 import os
 import random
 import time
-
+from pathlib import Path
 import helpers
 import stats
 from physics import Physics
@@ -10,6 +10,13 @@ from physics import Physics
 import pygame
 
 IMG_DIR = r'parts'
+if not os.path.exists(IMG_DIR):
+    os.mkdir(IMG_DIR)
+
+    for url in [
+        'https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1.png',
+
+    ]
 
 COLOR_MAP = {
     'attack': pygame.color.Color((255, 127, 127)),

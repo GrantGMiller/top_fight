@@ -2,9 +2,13 @@ import json
 import os
 import random
 
+STAT_PATH = 'stats'
+if not os.path.exists(STAT_PATH):
+    os.mkdir(STAT_PATH)
+
 
 def GetStats(ID):
-    path = f'stats\\{ID}.json'
+    path = f'{STAT_PATH}/{ID}.json'
     if not os.path.exists(path):
         d = {
             'attack': 0,

@@ -1,0 +1,1 @@
+pyinstaller main.py --onefile --add-data "parts;parts" --add-data "stats;stats" --noconsole

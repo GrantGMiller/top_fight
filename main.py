@@ -11,6 +11,9 @@ from winner import Winner
 
 pygame.init()
 
+pygame.display.set_caption('Dreidel Blades')
+
+
 screen = pygame.display.set_mode(
     # size=(640, 480),
     # size=(1280, 720),
@@ -74,5 +77,5 @@ while True:
     )
     screen.blit(surface_osd, (0, 0))
 
-    clock.tick()
+    clock.tick(120)
     pygame.display.flip()

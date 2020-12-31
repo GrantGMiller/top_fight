@@ -13,46 +13,48 @@ from physics import Physics
 import pygame
 
 IMG_DIR = r'parts'
-# if not os.path.exists(IMG_DIR):
-#     os.mkdir(IMG_DIR)
-#
-#     for url in [
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1119-2.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1119.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/11210.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1124-2.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1124.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1125-2.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1125.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1126-2.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1126.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1224-3.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/2 copy.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/3 copy.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/arrow eyes.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/bloop.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/cancer.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/diamond.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/email icon.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/gordon.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/libra.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/merp.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/mustang.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/snowflake.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/sun.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/swoop.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/unicorn.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/werp.png",
-#         "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/wonk.png",
-#     ]:
-#         try:
-#             with open(f'{IMG_DIR}/{url.split("/")[-1]}', mode='wb') as file:
-#                 print('fetching url=', url)
-#                 resp = requests.get(url)
-#                 file.write(resp.content)
-#         except Exception as e:
-#             print(e, url)
+if not os.path.exists(IMG_DIR):
+    os.mkdir(IMG_DIR)
+
+    for url in [
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1119-2.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1119.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/11210.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1124-2.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1124.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1125-2.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1125.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1126-2.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1126.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/1224-3.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/2 copy.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/3 copy.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/arrow eyes.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/bloop.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/cancer.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/diamond.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/email icon.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/gordon.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/libra.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/merp.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/mustang.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/snowflake.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/sun.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/swoop.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/unicorn.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/werp.png",
+        "https://raw.githubusercontent.com/GrantGMiller/top_fight/master/parts/wonk.png",
+    ]:
+        try:
+            resp = requests.get(url)
+            if resp.ok:
+                with open(f'{IMG_DIR}/{url.split("/")[-1]}', mode='wb') as file:
+                    print('fetching url=', url)
+                    file.write(resp.content)
+        except Exception as e:
+            print(e, url)
+
 print('os.path.exists(IMG_DIR)=', os.path.exists(IMG_DIR))
 pygame.display.set_icon(
     pygame.transform.scale(

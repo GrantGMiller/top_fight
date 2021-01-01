@@ -1,17 +1,17 @@
 import math
 import random
-
 import pygame
-from helpers import rot_center
-
 from physics import Physics
 
 
 class Unit(Physics):
-    def __init__(self, screen, imgPath=None, name=None, highlight=False):
+    def __init__(self, screen, img=None, name=None, highlight=False, showRPM=True, equipment=None, bounceOffWalls=True):
         self.screen = screen
         self.name = name or f'Name {random.randint(1111, 9999)}'
         self.highlight = highlight
+        self.showRPM = showRPM
+        self.equipment = equipment or []
+        self.bounceOffWalls = bounceOffWalls
 
         Physics.__init__(
             self,
@@ -20,10 +20,11 @@ class Unit(Physics):
             friction=0,  # acceleration in  per second
             angularFriction=100,  # acceleration in degrees per second
         )
-        if isinstance(imgPath, str):
-            self.imgBase = pygame.image.load(imgPath or r'parts\1.png')
+        if isinstance(img, str):
+            self.imgBase = pygame.image.load(img or r'parts\1.png')
         else:
-            self.imgBase = imgPath
+            self.imgBase = img
+
         self.imgBase = self.imgBase.convert_alpha()
         self.imgBase = pygame.transform.scale(self.imgBase, self.size)
         self.image = self.imgBase
@@ -41,6 +42,12 @@ class Unit(Physics):
         font = pygame.font.Font(None, int(self.height / 3))
         self.surfTitle = font.render(self.name, True, avgColor)
 
+    def Equip(self, weapon):
+        self.equipment.append(weapon)
+
+    def ClearEquipment(self):
+        self.equipment.clear()
+
     def _UpdateMask(self):
         self.mask = pygame.mask.from_surface(self.image)
         maskRect = self.mask.get_bounding_rects()[0]
@@ -54,53 +61,55 @@ class Unit(Physics):
             self.font = pygame.font.Font(None, int(size))
 
     def BounceOffWalls(self):
-        screenRect = self.screen.get_rect()
-        # when an object bounces off a wall, it should pickup or lose angular momentum
+        if self.bounceOffWalls:
+            screenRect = self.screen.get_rect()
+            # when an object bounces off a wall, it should pickup or lose angular momentum
 
-        # bounce off wall
-        bounceVector = pygame.Vector2(0, 0)
+            # bounce off wall
+            bounceVector = pygame.Vector2(0, 0)
 
-        if self.maskRect.left <= screenRect.left:
-            bounceVector += pygame.Vector2(1, 0)
+            if self.maskRect.left <= screenRect.left:
+                bounceVector += pygame.Vector2(1, 0)
 
-        elif self.maskRect.right >= screenRect.right:
-            bounceVector += pygame.Vector2(-1, 0)
+            elif self.maskRect.right >= screenRect.right:
+                bounceVector += pygame.Vector2(-1, 0)
 
-        if self.maskRect.top <= screenRect.top:
-            bounceVector += pygame.Vector2(0, 1)
+            if self.maskRect.top <= screenRect.top:
+                bounceVector += pygame.Vector2(0, 1)
 
-        elif self.maskRect.bottom >= screenRect.bottom:
-            bounceVector += pygame.Vector2(0, -1)
+            elif self.maskRect.bottom >= screenRect.bottom:
+                bounceVector += pygame.Vector2(0, -1)
 
-        self.KeepInBounds()
-        if bounceVector:
-            self.Bounce(reflectVector=bounceVector)
+            self.KeepInBounds()
+            if bounceVector:
+                self.Bounce(reflectVector=bounceVector)
 
     def KeepInBounds(self):
-        # self.position is the center (for some reason, im sorry)
-        if self.maskRect.left < self.screen.get_rect().left:
-            self.position = (
-                self.screen.get_rect().left + self.maskRect.width / 2 + 1,
-                self.position[1]
-            )
+        if self.bounceOffWalls:
+            # self.position is the center (for some reason, im sorry)
+            if self.maskRect.left < self.screen.get_rect().left:
+                self.position = (
+                    self.screen.get_rect().left + self.maskRect.width / 2 + 1,
+                    self.position[1]
+                )
 
-        elif self.maskRect.right > self.screen.get_rect().right:
-            self.position = (
-                self.screen.get_rect().right - self.maskRect.width / 2 - 1,
-                self.position[1]
-            )
+            elif self.maskRect.right > self.screen.get_rect().right:
+                self.position = (
+                    self.screen.get_rect().right - self.maskRect.width / 2 - 1,
+                    self.position[1]
+                )
 
-        if self.maskRect.top < self.screen.get_rect().top:
-            self.position = (
-                self.position[0],
-                self.screen.get_rect().top + self.maskRect.height / 2 + 1,
-            )
+            if self.maskRect.top < self.screen.get_rect().top:
+                self.position = (
+                    self.position[0],
+                    self.screen.get_rect().top + self.maskRect.height / 2 + 1,
+                )
 
-        elif self.maskRect.bottom > self.screen.get_rect().bottom:
-            self.position = (
-                self.position[0],
-                self.screen.get_rect().bottom - self.maskRect.height / 2 - 1,
-            )
+            elif self.maskRect.bottom > self.screen.get_rect().bottom:
+                self.position = (
+                    self.position[0],
+                    self.screen.get_rect().bottom - self.maskRect.height / 2 - 1,
+                )
 
     def Bounce(self, x=False, y=False, reflectVector=None, rotation=True):
         if reflectVector:
@@ -156,7 +165,7 @@ class Unit(Physics):
             self.screen.blit(
                 self.surfTitle,
                 (
-                    self.centerx - self.surfTitle.get_width()/2,
+                    self.centerx - self.surfTitle.get_width() / 2,
                     self.top - self.surfTitle.get_height(),
                 )
             )
@@ -182,19 +191,24 @@ class Unit(Physics):
             )
         )
 
-        # draw the rpm heads up
-        wordSurface = self.font.render(
-            f'{self.rpm}',
-            True,
-            self.fontColor if self.angularVelocity > self.angVelocityLimit else pygame.color.Color(
-                'red')
-        )
-        if math.fabs(self.angularVelocity) < self.angVelocityLimit/10:
-            self.velocity *= 0.95
+        # draw equipment
+        for equip in self.equipment:
+            equip.Draw(clock)
 
-        self.screen.blit(
-            wordSurface,
-            self.topleft,
-        )
+        # draw the rpm heads up
+        if self.showRPM:
+            wordSurface = self.font.render(
+                f'{self.rpm}',
+                True,
+                self.fontColor if self.angularVelocity > self.angVelocityLimit else pygame.color.Color(
+                    'red')
+            )
+            if math.fabs(self.angularVelocity) < self.angVelocityLimit / 10:
+                self.velocity *= 0.95
+
+            self.screen.blit(
+                wordSurface,
+                self.topleft,
+            )
 
         self.DrawHighlight()

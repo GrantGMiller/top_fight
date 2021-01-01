@@ -5,9 +5,10 @@ import pygame
 
 
 class Winner:
-    def __init__(self, winner, screen):
+    def __init__(self, winner, screen, msg='WINNER'):
         self.winner = winner
         self.screen = screen
+        self.msg = msg
         self.period = 2  # seconds
         self.angle = 0
         self.imgBase = pygame.transform.scale(
@@ -18,7 +19,7 @@ class Winner:
             )
         )
         self.surfTitle = pygame.font.Font(None, int(screen.get_width() / 4)).render(
-            'WINNER',
+            self.msg,
             True,
             pygame.color.Color('white'),
         )

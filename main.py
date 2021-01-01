@@ -1,8 +1,20 @@
 import random
 import sys
 import time
-
+import os
 import pygame
+
+from equip import Equip
+
+if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    print('frozen - os.chdir(', sys._MEIPASS)
+    os.chdir(sys._MEIPASS)
+else:
+    print('not frozen')
+
+print('sys.argv[0] is', sys.argv[0])
+print('sys.executable is', sys.executable)
+print('os.getcwd is', os.getcwd())
 
 from choose_top import Choose
 from game import Game
@@ -12,7 +24,6 @@ from winner import Winner
 pygame.init()
 
 pygame.display.set_caption('Dreidel Blades')
-
 
 screen = pygame.display.set_mode(
     # size=(640, 480),
@@ -35,26 +46,36 @@ while True:
 
     if isinstance(active, Choose):
         if active.startGameWith is not None:
-            index, stats = active.startGameWith
+            imgPath, stats = active.startGameWith
+
+            # game = Game(screen)
+            # game.NewGame(index, stats, numUnits=1, name='Player 1')
+            # gameOverTime = None
+            # active = game
+
+            active = Equip(screen, imgPath, stats)
+
+    elif isinstance(active, Equip):
+        if active.ready:
+            img, stats, equipmentTypes = active.GetSelection()
             game = Game(screen)
-            game.NewGame(index, stats, numUnits=1, name='Player 1')
+            game.NewGame(img, stats, numUnits=1, name='Player 1', equipmentTypes=equipmentTypes)
             gameOverTime = None
             active = game
 
     elif isinstance(active, Game):
-        if game.gameOver:
+        if active.gameOver:
             if gameOverTime is None:
                 gameOverTime = time.time()
             if time.time() - gameOverTime > 5:
-                active = Winner(game.units[0], screen)
+                if active.player not in active.units:
+                    msg = 'You Lose'
+                else:
+                    msg = 'You Win'
+                active = Winner(active.units[0], screen, msg=msg)
                 lastGameEndTime = time.time()
 
     elif isinstance(active, Winner) and time.time() - lastGameEndTime > 5:
-        # game = Game(screen)
-        # game.NewGame(numUnits=2)
-        # gameOverTime = None
-        # active = game
-
         active = Choose(screen)
 
     for event in pygame.event.get():

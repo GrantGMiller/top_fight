@@ -30,16 +30,21 @@ class Game:
 
         self.gameOver = False
 
-    def NewGame(self, img=None, stats=None, numUnits=None, name=None):
+    def NewGame(self, img=None, stats=None, numUnits=None, name=None, equipmentTypes=None):
         if img:
+            equipmentTypes = equipmentTypes or []
             unit = self.AddUnit(
                 Unit(
                     self.screen,
-                    imgPath=img,
+                    img=img,
                     highlight=True,
                     name=name,
                 )
             )
+            for equipType in equipmentTypes:
+                equip = equipType(self.screen, unit)
+                unit.Equip(equip)
+
             unit.angularVelocity += stats.get('spin', 0) * 10
             self.player = unit
             unit.position = (unit.width, unit.height)
@@ -66,7 +71,7 @@ class Game:
         other = self.AddUnit(
             Unit(
                 self.surf,
-                imgPath=random.choice(
+                img=random.choice(
                     ['parts/' + item for item in os.listdir(r'parts')]
                 ),
                 **k

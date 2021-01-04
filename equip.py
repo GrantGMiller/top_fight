@@ -29,7 +29,8 @@ class Equip:
         # self.unit.Equip(WeaponFireStick(self.screen, self.unit))
 
         self.weaponsTypes = [
-            WeaponFireStick
+            WeaponFireStick,
+            WeaponShield,
         ]
 
         # init
@@ -73,7 +74,7 @@ class Equip:
                 self.unit.ClearEquipment()
                 print('current=', self.current)
                 print('wetypes=', self.weaponsTypes)
-                if 0 <= self.current <= len(self.weaponsTypes) -1:
+                if 0 <= self.current <= len(self.weaponsTypes) - 1:
                     try:
                         weaponType = self.weaponsTypes[self.current]
                         self.unit.Equip(weaponType(self.screen, self.unit))
@@ -111,7 +112,7 @@ class Equip:
         # draw the weapons
         x = self.screen.get_rect().centerx + (
                 (self.screen.get_width() - self.screen.get_rect().centerx) - self.unit.width) / 2
-        spacing = 100
+        spacing = 200
         weaponTypes = sorted(list(self.previewUnits.keys()), key=lambda t: t.NAME)
         for index, weaponType in enumerate(weaponTypes):
             previewUnit = self.previewUnits[weaponType]
@@ -131,6 +132,51 @@ class Equip:
 
         # draw the unit preview
         self.unit.Draw(clock)
+
+
+class WeaponShield(pygame.Rect):
+    NAME = 'Shield'
+
+    def __init__(self, screen, unit):
+        self.screen = screen
+        self.unit = unit
+
+        self.surf = pygame.Surface((
+            int(self.unit.width * 1.2),
+            int(self.unit.height * 1.2),
+        ))
+        pygame.draw.circle(
+            self.surf,
+            (0, 255, 0),  # pygame.transform.average_color(self.unit.imgBase),
+            self.surf.get_rect().center,
+            (self.surf.get_width() / 2) - 1,
+        )
+        pygame.draw.circle(
+            self.surf,
+            (0, 0, 0),  # pygame.transform.average_color(self.unit.imgBase),
+            self.surf.get_rect().center,
+            (self.surf.get_width() / 2) - 5,
+        )
+        self.surf.set_colorkey((0, 0, 0))
+
+        self.shield = 100
+
+    @staticmethod
+    def GetStatDelta():
+        return {
+            'attack': 0,
+            'defense': 10,
+            'spin': -10,
+        }
+
+    def Draw(self, clock):
+        self.screen.blit(
+            self.surf,
+            (
+                self.unit.centerx - (self.surf.get_width() / 2),
+                self.unit.centery - (self.surf.get_height() / 2),
+            )
+        )
 
 
 class WeaponFireStick(pygame.Rect):
@@ -204,7 +250,8 @@ class WeaponFireStick(pygame.Rect):
                 color=(
                     random.randint(200, 255),
                     random.randint(100, 200),
-                    0
+                    0,
+                    127
                 ),
                 velocity=(0, 0),
             )
@@ -238,4 +285,5 @@ class WeaponFireStick(pygame.Rect):
                 particle.color,
                 particle.position,
                 particle.size,
+
             )
